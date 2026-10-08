@@ -13,25 +13,36 @@ export const WEATHER = {
 
 // type 'habit' builds your profile; type 'fact' is a guess with a right answer
 export const QUESTIONS = [
-  { id: 'home', type: 'habit', q: 'Where do you live?', emoji: '🏠',
-    options: ['Apartment or dorm', 'House, little or no yard', 'House with a yard'] },
-  { id: 'shower', type: 'habit', q: 'How long is your usual shower?', emoji: '🚿',
-    options: ['About 5 minutes', 'About 10 minutes', 'About 15 minutes', '20 minutes or more'] },
-  { id: 'fact1', type: 'fact', q: 'Guess: a leaky toilet can waste up to how much water in one day?', emoji: '🚽',
+  { id: 'home', type: 'habit', q: "First up: what's your home base?", emoji: '🏡',
+    options: ['🏢 Apartment or dorm', '🏠 House, tiny or no yard', '🌳 House with a yard'] },
+  { id: 'shower', type: 'habit', q: 'Pick your shower vibe', emoji: '🚿',
+    options: ['⚡ In and out (about 5 min)', '🎵 A couple of songs (about 10)', '🎶 Half an album (about 15)', '🎤 Full concert (20+ min)'] },
+  { id: 'fact1', type: 'fact', q: 'A sneaky toilet leak can waste up to how much water a day?', emoji: '🚽',
     options: ['5 gallons', '50 gallons', '200 gallons'], answer: 2,
-    reveal: 'Up to 200 gallons a day, says the EPA. Most leaks make no sound.' },
-  { id: 'tap', type: 'habit', q: 'Do you leave the tap running while you brush your teeth?', emoji: '🪥',
-    options: ['Always', 'Sometimes', 'Never'] },
-  { id: 'dishes', type: 'habit', q: 'How are dishes usually washed?', emoji: '🍽️',
-    options: ['Dishwasher, only when full', 'Dishwasher, half-full is fine', 'By hand, tap running', 'By hand, in a filled sink'] },
-  { id: 'laundry', type: 'habit', q: 'How many laundry loads do you run a week?', emoji: '👕',
-    options: ['1 load', '2 to 3 loads', '4 or more'] },
-  { id: 'yard', type: 'habit', q: 'In summer, how often are your yard or plants watered?', emoji: '🌵',
-    options: ['Never, no plants', 'Once or twice a week', '3 to 4 times a week', 'Every day'] },
-  { id: 'fact2', type: 'fact', q: 'Guess: how much of Arizona was abnormally dry or in drought at the end of September 2026?', emoji: '🏜️',
+    reveal: 'Up to 200 gallons a day (EPA). And most leaks make zero noise. Sneaky!' },
+  { id: 'tap', type: 'habit', q: 'Brushing teeth: tap on or tap off?', emoji: '🪥',
+    options: ['💦 On the whole time', '🤷 Depends on the day', '🚫 Off while I brush'] },
+  { id: 'dishes', type: 'habit', q: 'Dish duty! How do they usually get clean?', emoji: '🍽️',
+    options: ['🧼 Dishwasher, packed full', '🍽️ Dishwasher, whenever', '💧 By hand, under the tap', '🫧 By hand, in a filled sink'] },
+  { id: 'laundry', type: 'habit', q: 'Laundry loads in a typical week?', emoji: '🧺',
+    options: ['👕 Just one', '👕👕 Two or three', '👕👕👕 Four or more'] },
+  { id: 'yard', type: 'habit', q: 'Summer plant care: how often does stuff get watered?', emoji: '🌵',
+    options: ['🌵 Never (cactus life, or no plants)', '🪴 Once or twice a week', '🌿 3 or 4 times a week', '🌳 Every day'] },
+  { id: 'fact2', type: 'fact', q: 'How much of Arizona was dry or in drought at the end of September 2026?', emoji: '🏜️',
     options: ['About 30%', 'About 60%', 'About 90%'], answer: 2,
-    reveal: 'About 90% (U.S. Drought Monitor, Sept 29, 2026). Every gallon counts here.' },
+    reveal: 'About 90% (U.S. Drought Monitor, Sept 29, 2026). That is why every drop you save here counts.' },
 ];
+
+// A fun "water personality" from your answers. No judging, just vibes.
+export function personality(profile) {
+  const g = Object.fromEntries(profile.parts.map(p => [p.key, p.gal]));
+  if (profile.habits < 60) return { em: '🦎', name: 'The Desert Lifeguard', line: 'You already go easy on water. Now help your friends catch up!' };
+  const top = ['yard', 'shower', 'dishes', 'laundry'].sort((x, y) => g[y] - g[x])[0];
+  if (top === 'yard') return { em: '🌵', name: 'The Desert Gardener', line: 'Your plants are living their best life. Outdoors is where your biggest wins hide.' };
+  if (top === 'shower') return { em: '🎤', name: 'The Shower Singer', line: 'Your shower is your stage. One song shorter is an easy win.' };
+  if (top === 'dishes') return { em: '🫧', name: 'The Dish Hero', line: 'You keep the kitchen sparkling. A filled sink beats a running tap.' };
+  return { em: '🎨', name: 'The Splash Artist', line: 'A little bit of everything. Small swaps add up fast for you.' };
+}
 
 // gallons per person per day, by answer index
 const G = {
@@ -62,14 +73,14 @@ export function buildProfile(a) {
 export function buildSwaps(a, profile) {
   const g = Object.fromEntries(profile.parts.map(p => [p.key, p.gal]));
   const s = [];
-  s.push({ id: 'leak', icon: '🔧', title: 'Fix the leak we found', detail: 'A flapper in the toilet tank is worn. A $10 part.', gal: LEAK_GAL, leak: true });
-  if ((a.shower ?? 1) > 0) s.push({ id: 'shower', icon: '🚿', title: 'Cut 2 minutes from your shower', detail: 'Play one song. Done when it ends.', gal: 4.2 });
-  if (g.tap > 0) s.push({ id: 'tap', icon: '🪥', title: 'Turn off the tap while brushing', detail: 'Wet the brush, turn it off, rinse at the end.', gal: g.tap });
+  s.push({ id: 'leak', icon: '🔧', title: 'Fix the sneaky leak', detail: 'A worn flapper in the toilet tank. A $10 part.', gal: LEAK_GAL, leak: true });
+  if ((a.shower ?? 1) > 0) s.push({ id: 'shower', icon: '🚿', title: 'Shower one song shorter', detail: 'About 2 minutes. Your playlist, your timer. 🎵', gal: 4.2 });
+  if (g.tap > 0) s.push({ id: 'tap', icon: '🪥', title: 'Tap off while brushing', detail: 'Wet the brush, tap off, rinse at the end.', gal: g.tap });
   if ((a.dishes ?? 0) === 1) s.push({ id: 'dishes', icon: '🍽️', title: 'Only run the dishwasher when full', detail: 'Same dishes, half the loads.', gal: 2 });
   if ((a.dishes ?? 0) === 2) s.push({ id: 'dishes', icon: '🍽️', title: 'Wash in a filled sink, not under the tap', detail: 'Or use the dishwasher. It uses less.', gal: 9 });
   if ((a.laundry ?? 1) > 0) s.push({ id: 'laundry', icon: '👕', title: 'Wash only full laundry loads', detail: 'One fewer load a week.', gal: Math.round(g.laundry * 0.3 * 10) / 10 });
   if (g.yard > 0) s.push({ id: 'yard', icon: '🌵', title: `AI tip: water ${WEATHER.pctLess}% less this week`, detail: `Real weather: plants in Phoenix need ${WEATHER.pctLess}% less water now than in June.`, gal: Math.round(g.yard * WEATHER.pctLess / 10) / 10, ai: true });
-  s.push({ id: 'bottle', icon: '🧊', title: 'Keep cold water in the fridge', detail: 'No more running the tap until it gets cold.', gal: 2 });
+  s.push({ id: 'bottle', icon: '🧊', title: 'Keep a cold bottle in the fridge', detail: 'No more waiting for the tap to run cold. 🧊', gal: 2 });
   return s;
 }
 

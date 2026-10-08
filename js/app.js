@@ -23,15 +23,15 @@ function toast(msg) {
   clearTimeout(toast.t); toast.t = setTimeout(() => $toast.classList.remove('show'), 2600);
 }
 
-const LOGO = `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#1D6F99" stroke-width="2" opacity=".35"/><path d="M16 6.5s-6.5 7.6-6.5 12a6.5 6.5 0 0 0 13 0c0-4.4-6.5-12-6.5-12z" fill="#1D6F99"/></svg>`;
+const LOGO = `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#0BA5C7" stroke-width="2" opacity=".35"/><path d="M16 6.5s-6.5 7.6-6.5 12a6.5 6.5 0 0 0 13 0c0-4.4-6.5-12-6.5-12z" fill="#0BA5C7"/></svg>`;
 const RIPPLE = `<svg class="ripple" viewBox="0 0 200 200" aria-hidden="true">
-  <circle cx="100" cy="100" r="34" fill="none" stroke="#1D6F99" stroke-width="3" opacity=".9"/>
-  <circle cx="100" cy="100" r="56" fill="none" stroke="#1D6F99" stroke-width="2.5" opacity=".6"/>
-  <circle cx="100" cy="100" r="78" fill="none" stroke="#1D6F99" stroke-width="2" opacity=".35"/>
-  <circle cx="100" cy="100" r="98" fill="none" stroke="#1D6F99" stroke-width="1.5" opacity=".18"/>
-  <path d="M100 74s-17 20-17 31a17 17 0 0 0 34 0c0-11-17-31-17-31z" fill="#1D6F99"/>
-  <circle cx="100" cy="44" r="6" fill="#B24A24"/><circle cx="51" cy="128" r="6" fill="#B24A24"/><circle cx="149" cy="128" r="6" fill="#B24A24"/>
-  <circle cx="22" cy="100" r="4.5" fill="#B24A24" opacity=".7"/><circle cx="178" cy="100" r="4.5" fill="#B24A24" opacity=".7"/></svg>`;
+  <circle cx="100" cy="100" r="34" fill="none" stroke="#0BA5C7" stroke-width="3" opacity=".9"/>
+  <circle cx="100" cy="100" r="56" fill="none" stroke="#0BA5C7" stroke-width="2.5" opacity=".6"/>
+  <circle cx="100" cy="100" r="78" fill="none" stroke="#0BA5C7" stroke-width="2" opacity=".35"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#0BA5C7" stroke-width="1.5" opacity=".18"/>
+  <path d="M100 74s-17 20-17 31a17 17 0 0 0 34 0c0-11-17-31-17-31z" fill="#0BA5C7"/>
+  <circle cx="100" cy="44" r="6" fill="#FF6B4A"/><circle cx="51" cy="128" r="6" fill="#FF6B4A"/><circle cx="149" cy="128" r="6" fill="#FF6B4A"/>
+  <circle cx="22" cy="100" r="4.5" fill="#FF6B4A" opacity=".7"/><circle cx="178" cy="100" r="4.5" fill="#FF6B4A" opacity=".7"/></svg>`;
 const ICON = {
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/></svg>',
   board: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3"/></svg>',
@@ -68,8 +68,8 @@ function vWelcome() {
   return `${topbar()}
   <section class="hero fade">
     <span class="eyebrow">Strava for water</span>
-    <h1>Every drop counts more with friends.</h1>
-    <p>Take a 60-second quiz, find out how much water you really use, then race your class to save the most. Fair for everyone: we rank progress, not gallons.</p>
+    <h1>Saving water, but make it a game.</h1>
+    <p>Take a 60-second quiz to find your water personality, then race your class. Fair for everyone: we score progress, not gallons. 💧</p>
   </section>
   ${RIPPLE}
   <div class="stack" style="margin-top:8px">
@@ -109,47 +109,46 @@ function vQuiz() {
       <div class="qbar"><i style="width:${((S.qi + (sel !== undefined ? 1 : 0)) / total) * 100}%"></i></div>
       <span class="qcount">${S.qi + 1}/${total}</span></div>
     <div class="fade" key="${Q.id}">
-      ${isFact ? '<span class="pill terra factbadge">QUICK GUESS</span>' : ''}
+      ${isFact ? '<span class="pill terra factbadge">🎯 QUICK GUESS</span>' : (S.qi === 0 ? '<span class="pill blue factbadge">No wrong answers. Just for fun!</span>' : '')}
       <div class="qemoji">${Q.emoji}</div>
       <h2 class="qtext">${esc(Q.q)}</h2>
       <div class="opts">${opts}</div>
       ${rev ? `<div class="card ${sel === Q.answer ? 'blue' : 'terra'} reveal">
-          <b>${sel === Q.answer ? 'Nice, you got it! 🎉' : 'Not quite!'}</b>
+          <b>${sel === Q.answer ? 'Nailed it! 🎉' : 'Ooh, close! Here\'s the real answer 👇'}</b>
           <p class="small" style="margin-top:6px;line-height:1.45">${esc(Q.reveal)}</p></div>
-        <button class="btn" data-act="next" style="margin-top:14px">${S.qi === total - 1 ? 'See my water profile' : 'Next'}</button>` : ''}
+        <button class="btn" data-act="next" style="margin-top:14px">${S.qi === total - 1 ? 'Reveal my water personality ✨' : 'Next'}</button>` : ''}
     </div>`;
 }
 
 function vProfile() {
   const p = D.buildProfile(S.me.answers || {});
+  const t = D.personality(p);
   const max = Math.max(...p.parts.map(x => x.gal), D.LEAK_GAL);
   const bars = p.parts.filter(x => x.gal > 0).sort((a, b) => b.gal - a.gal).map(x =>
     `<div class="bar"><span>${esc(x.label)}</span><b>${fmt(x.gal)} gal</b><div class="track"><i style="width:${(x.gal / max) * 100}%"></i></div></div>`).join('');
-  const vsAvg = p.habits - 82;
   return `${topbar()}
   <div class="stack fade">
-    <span class="eyebrow">Your water profile</span>
-    <div><div class="big">${p.habits}</div><div style="font-weight:700;font-size:18px;margin-top:6px">gallons a day, just for you</div></div>
-    <div class="compare">
-      <div><span class="small muted">You</span><b>${p.habits} gal</b></div>
-      <div><span class="small muted">Average American</span><b>82 gal</b></div>
+    <span class="eyebrow">Your water personality</span>
+    <div class="card dark ptype pop"><div class="em">${t.em}</div><div><h2>${esc(t.name)}</h2><p>${esc(t.line)}</p></div></div>
+    <div class="card stack">
+      <div class="row"><div><div class="big" style="font-size:56px">${p.habits}</div><div style="font-weight:700">gallons a day, your estimate</div></div></div>
+      <p class="small muted" style="line-height:1.45">The average American uses about 82 gallons a day at home (EPA). ${p.habits > 82 ? 'More water also means more room to climb the leaderboard. 🏆' : 'You are already efficient, so every swap is a bonus. ✨'}</p>
+      <div class="bars">${bars}</div>
     </div>
-    <p class="small muted">${vsAvg > 5 ? `That's ${vsAvg} gallons above average. Plenty of room to save.` : vsAvg < -5 ? `That's ${-vsAvg} gallons below average. Nice! Every bit still counts.` : 'Right around average.'} (EPA WaterSense: 82 gallons a day at home.)</p>
-    <div class="card"><div class="bars">${bars}</div></div>
     <div class="card terra alert pop">
-      <div class="ic">🚨</div>
-      <div><h3>Wait, your meter noticed something</h3>
-      <p class="small" style="line-height:1.45">Water ran nonstop from 1 AM to 5 AM last night. That looks like a leak, about <b>${D.LEAK_GAL} gallons a day</b> going down the drain.</p></div>
+      <div class="ic">👀</div>
+      <div><h3>Plot twist!</h3>
+      <p class="small" style="line-height:1.45">Your meter heard water running from 1 AM to 5 AM. Probably a sneaky toilet leak, about <b>${D.LEAK_GAL} gallons a day</b>. Good news: it's a $10 fix.</p></div>
     </div>
-    <button class="btn" data-act="toapp">Start my challenge</button>
+    <button class="btn" data-act="toapp">Let's start the challenge 🚀</button>
     <p class="foot">Your home is simulated from your answers. Estimates use EPA WaterSense and ENERGY STAR figures.</p>
   </div>`;
 }
 
 function ring(pct) {
   const r = 52, c = 2 * Math.PI * r, v = Math.min(pct, 50) / 50; // ring fills at 50%
-  return `<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${r}" fill="none" stroke="#2E5563" stroke-width="11"/>
-    <circle cx="60" cy="60" r="${r}" fill="none" stroke="#7CC6E6" stroke-width="11" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - v)}" style="transition:stroke-dashoffset .6s"/></svg>
+  return `<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="11"/>
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - v)}" style="transition:stroke-dashoffset .6s"/></svg>
     <div class="val"><div><b>${fmt(pct)}%</b><span>BETTER</span></div></div></div>`;
 }
 
@@ -165,7 +164,7 @@ function vHome() {
       <span class="g">−${fmt(s.gal)}<br><span class="small" style="font-weight:500">gal/day</span></span><span class="chk">${on[s.id] ? '✓' : ''}</span></button>`;
   return `${topbar()}
   <div class="stack fade">
-    <div><span class="eyebrow">Hi, ${esc(me.emoji)} ${esc(me.name)}</span></div>
+    <div><span class="eyebrow">Hi, ${esc(me.emoji)} ${esc(me.name)}</span><div class="small muted" style="margin-top:4px;font-weight:700">${(() => { const t = D.personality(prof); return t.em + ' ' + esc(t.name); })()}</div></div>
     <div class="card dark ringwrap">
       ${ring(me.progress || 0)}
       <div class="stack" style="gap:10px">
@@ -175,17 +174,17 @@ function vHome() {
     </div>
     ${!on.leak ? `<div class="card terra alert">
         <div class="ic">🚨</div>
-        <div style="flex:1"><h3>Possible leak</h3>
-          <p class="small" style="line-height:1.45;margin-bottom:10px">Water ran nonstop 1 AM to 5 AM. Likely a worn toilet flapper, a $10 fix. Worth <b>${D.LEAK_GAL} gal a day</b>.</p>
+        <div style="flex:1"><h3>Sneaky leak spotted 👀</h3>
+          <p class="small" style="line-height:1.45;margin-bottom:10px">Water ran 1 AM to 5 AM while you slept. A $10 toilet flapper fixes it and wins you <b>${D.LEAK_GAL} gal a day</b>.</p>
           <button class="btn terra sm" data-act="swap" data-id="leak">Fix it 🔧</button></div></div>`
-      : `<div class="card blue alert"><div class="ic">✅</div><div><h3>Leak fixed</h3><p class="small">Your meter looks calm overnight now. +${D.LEAK_GAL} gal a day saved.</p></div></div>`}
+      : `<div class="card blue alert"><div class="ic">✅</div><div><h3>Leak fixed!</h3><p class="small">Quiet nights again. +${D.LEAK_GAL} gal a day saved. 🎉</p></div></div>`}
     <div class="card weather">
       <div class="num">−${D.WEATHER.pctLess}%</div>
       <div><div class="pill blue" style="margin-bottom:6px">AI TIP · REAL WEATHER</div>
-      <p class="small" style="line-height:1.45">Plants in Phoenix need <b>${D.WEATHER.pctLess}% less water</b> this week than in June (${D.WEATHER.etoWeek} vs ${D.WEATHER.etoJune} in a day). Water less, they'll be fine.</p>
+      <p class="small" style="line-height:1.45">Plants in Phoenix need <b>${D.WEATHER.pctLess}% less water</b> this week than in June (${D.WEATHER.etoWeek} vs ${D.WEATHER.etoJune} in a day). Your plants will be just fine with less.</p>
       <p class="small muted" style="margin-top:4px">${D.WEATHER.station}, ${D.WEATHER.weekLabel}</p></div>
     </div>
-    <div class="row"><h3 style="font-size:22px">Pick your swaps</h3><div class="spacer"></div><span class="small muted">${Object.keys(on).filter(k => on[k] && k !== 'leak').length}/${rest.length} on</span></div>
+    <div class="row"><h3 style="font-size:22px">Pick your easy wins</h3><div class="spacer"></div><span class="small muted">${Object.keys(on).filter(k => on[k] && k !== 'leak').length}/${rest.length} on</span></div>
     <div class="stack" style="gap:10px">${rest.map(sw).join('')}</div>
     <button class="btn ghost" data-act="tab" data-tab="board">See the leaderboard 🏆</button>
     <button class="small" data-act="retake" style="color:var(--blue);font-weight:700;padding:6px">Retake the quiz</button>

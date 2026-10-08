@@ -12,7 +12,7 @@ const joinUrl = () => {
   if (SESSION !== 'class') u.searchParams.set('s', SESSION);
   return u.href;
 };
-const LOGO = `<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#7CC6E6" stroke-width="2" opacity=".4"/><path d="M16 6.5s-6.5 7.6-6.5 12a6.5 6.5 0 0 0 13 0c0-4.4-6.5-12-6.5-12z" fill="#7CC6E6"/></svg>`;
+const LOGO = `<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#3DD8F5" stroke-width="2" opacity=".4"/><path d="M16 6.5s-6.5 7.6-6.5 12a6.5 6.5 0 0 0 13 0c0-4.4-6.5-12-6.5-12z" fill="#3DD8F5"/></svg>`;
 
 function qr() {
   if (!window.qrcode) return '';
@@ -43,7 +43,7 @@ function quizPanel() {
     <div class="t"><i style="width:${((counts[i] || 0) / max) * 100}%"></i></div></div>`).join('');
   return `<div class="h">${Q.type === 'fact' ? 'Quick guess' : 'Room habits'} · live from your answers</div>
     <div class="qemoji">${Q.emoji}</div>
-    <div class="qtitle">${esc(Q.q.replace(/^Guess: /, ''))}</div>
+    <div class="qtitle">${esc(Q.q)}</div>
     <div class="bars">${bars}</div>
     <div class="insight">${n ? esc(insightFor(Q, counts, n)) : 'Waiting for answers…'}</div>
     <div class="dots">${D.QUESTIONS.map((_, i) => `<i class="${i === S.qi % D.QUESTIONS.length ? 'on' : ''}"></i>`).join('')}</div>`;
