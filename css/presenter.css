@@ -1,0 +1,50 @@
+:root{--sand:#F5EFE3;--ink:#142630;--blue:#1D6F99;--blue-l:#7CC6E6;--terra:#B24A24;--terra-l:#F2A07B;--dark:#0F2B36;--dark2:#173A47;--dark3:#2E5563;--soft:#A9C4CC;--green:#5FBF8F;
+--head:'Fraunces',Georgia,serif;--body:'DM Sans',system-ui,Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--dark);color:var(--sand);font-family:var(--body);overflow:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+#screen{height:100vh;display:grid;grid-template-columns:24vw 1fr 30vw;grid-template-rows:auto 1fr auto;gap:1.6vw;padding:2vw 2.4vw}
+header{grid-column:1/-1;display:flex;align-items:center;gap:1.2vw}
+.logo{display:flex;align-items:center;gap:.7vw;font-family:var(--head);font-size:2.4vw;font-weight:600}
+.logo svg{width:2.6vw;height:2.6vw}
+.tag{font-size:.95vw;font-weight:700;letter-spacing:.2em;color:var(--terra-l);text-transform:uppercase}
+.live{margin-left:auto;display:flex;align-items:center;gap:.5vw;font-weight:700;font-size:1vw;color:var(--green)}
+.live i{width:.7vw;height:.7vw;border-radius:50%;background:var(--green);animation:p 1.8s infinite}
+.live.local{color:var(--terra-l)} .live.local i{background:var(--terra-l);animation:none}
+@keyframes p{50%{opacity:.35}}
+.panel{background:var(--dark2);border-radius:1.4vw;padding:1.6vw;display:flex;flex-direction:column;min-height:0}
+.h{font-size:.85vw;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);margin-bottom:1vw}
+.qr{background:#fff;border-radius:1.2vw;padding:1vw;aspect-ratio:1}
+.qr svg{width:100%;height:100%;display:block}
+.scan{font-family:var(--head);font-size:2.2vw;line-height:1.1;margin-top:1.2vw}
+.url{font-size:.9vw;color:var(--soft);margin-top:.5vw;word-break:break-all}
+.count{margin-top:auto;display:flex;align-items:baseline;gap:.6vw}
+.count b{font-family:var(--head);font-size:4.4vw;color:var(--blue-l);line-height:1}
+.count span{font-size:1.1vw;color:var(--soft)}
+.qtitle{font-family:var(--head);font-size:2.3vw;line-height:1.15;margin-bottom:1.8vw;min-height:5.3vw}
+.qemoji{font-size:2.6vw;margin-bottom:.6vw}
+.bars{display:flex;flex-direction:column;gap:1.1vw}
+.bar{display:grid;grid-template-columns:1fr auto;gap:.4vw 1vw;font-size:1.3vw;font-weight:500}
+.bar b{font-size:1.4vw}
+.bar .t{grid-column:1/-1;height:2.2vw;border-radius:.6vw;background:var(--dark3);overflow:hidden}
+.bar .t i{display:block;height:100%;background:var(--blue-l);border-radius:.6vw;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.bar.right .t i{background:var(--green)} .bar.right span::after{content:'  ✓ correct';color:var(--green);font-weight:700}
+.dots{display:flex;gap:.5vw;margin-top:auto;padding-top:1.2vw}
+.dots i{width:.7vw;height:.7vw;border-radius:50%;background:var(--dark3)} .dots i.on{background:var(--blue-l)}
+.insight{margin-top:1.4vw;font-size:1.25vw;color:var(--terra-l);font-weight:700;min-height:1.6vw}
+.right{display:flex;flex-direction:column;gap:1.6vw;min-height:0}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:.9vw;padding:.62vw 0;border-bottom:1px solid var(--dark3);font-size:1.25vw;transition:background .4s}
+.row:last-child{border-bottom:0}
+.row .rk{width:2vw;text-align:center;font-weight:700;color:var(--soft)}
+.row .av{font-size:1.4vw}
+.row .nm{flex:1;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .sub{font-size:.85vw;color:var(--soft);font-weight:500}
+.row .pc{font-family:var(--head);font-size:1.6vw;color:var(--blue-l)}
+.empty{color:var(--soft);font-size:1.1vw;padding:1vw 0}
+footer{grid-column:1/-1;display:flex;align-items:center;gap:2.4vw;background:var(--blue);border-radius:1.4vw;padding:1.2vw 2vw}
+footer .big{font-family:var(--head);font-size:3.4vw;line-height:1}
+footer .lbl{font-size:1vw;line-height:1.35;max-width:14vw}
+footer .sep{width:1px;align-self:stretch;background:rgba(245,239,227,.3)}
+.reset{margin-left:auto;font-size:.85vw;color:rgba(245,239,227,.7);padding:.5vw .9vw;border:1px solid rgba(245,239,227,.35);border-radius:99px}
+.reset.arm{background:var(--terra);color:#fff;border-color:var(--terra)}
