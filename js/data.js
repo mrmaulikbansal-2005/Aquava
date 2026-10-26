@@ -15,23 +15,45 @@ export const WEATHER = {
 export const QUESTIONS = [
   { id: 'home', type: 'habit', q: "First up: what's your home base?", emoji: '🏡',
     options: ['🏢 Apartment or dorm', '🏠 House, tiny or no yard', '🌳 House with a yard'] },
+  { id: 'fact1', type: 'fact', q: 'How much water does a typical American family use at home every day?', emoji: '🏠',
+    options: ['About 30 gallons', 'About 100 gallons', '300+ gallons'], answer: 2,
+    reveal: 'Over 300 gallons a day (EPA). Most of us only see it once a month, on a bill.' },
   { id: 'shower', type: 'habit', q: 'Pick your shower vibe', emoji: '🚿',
     options: ['⚡ In and out (about 5 min)', '🎵 A couple of songs (about 10)', '🎶 Half an album (about 15)', '🎤 Full concert (20+ min)'] },
-  { id: 'fact1', type: 'fact', q: 'A sneaky toilet leak can waste up to how much water a day?', emoji: '🚽',
+  { id: 'fact2', type: 'fact', q: 'A sneaky toilet leak can waste up to how much water a day?', emoji: '🚽',
     options: ['5 gallons', '50 gallons', '200 gallons'], answer: 2,
-    reveal: 'Up to 200 gallons a day (EPA). And most leaks make zero noise. Sneaky!' },
+    reveal: 'Up to 200 gallons a day (EPA). And most leaks make zero noise.' },
   { id: 'tap', type: 'habit', q: 'Brushing teeth: tap on or tap off?', emoji: '🪥',
     options: ['💦 On the whole time', '🤷 Depends on the day', '🚫 Off while I brush'] },
   { id: 'dishes', type: 'habit', q: 'Dish duty! How do they usually get clean?', emoji: '🍽️',
     options: ['🧼 Dishwasher, packed full', '🍽️ Dishwasher, whenever', '💧 By hand, under the tap', '🫧 By hand, in a filled sink'] },
-  { id: 'laundry', type: 'habit', q: 'Laundry loads in a typical week?', emoji: '🧺',
-    options: ['👕 Just one', '👕👕 Two or three', '👕👕👕 Four or more'] },
+  { id: 'fact3', type: 'fact', q: 'In September 2026, Lake Mead hit its lowest level since when?', emoji: '🏞️',
+    options: ['The 1990s', 'The 1960s', 'The 1930s'], answer: 2,
+    reveal: 'The 1930s: 1,037.8 feet (U.S. Bureau of Reclamation). Lake Mead supplies water to millions in Arizona.' },
   { id: 'yard', type: 'habit', q: 'Summer plant care: how often does stuff get watered?', emoji: '🌵',
     options: ['🌵 Never (cactus life, or no plants)', '🪴 Once or twice a week', '🌿 3 or 4 times a week', '🌳 Every day'] },
-  { id: 'fact2', type: 'fact', q: 'How much of Arizona was dry or in drought at the end of September 2026?', emoji: '🏜️',
+  { id: 'fact4', type: 'fact', q: 'How much of Arizona was dry or in drought at the end of September 2026?', emoji: '🏜️',
     options: ['About 30%', 'About 60%', 'About 90%'], answer: 2,
-    reveal: 'About 90% (U.S. Drought Monitor, Sept 29, 2026). That is why every drop you save here counts.' },
+    reveal: 'About 90% (U.S. Drought Monitor, Sept 29, 2026). Every drop saved here counts.' },
 ];
+
+// Event score out of 1,000: finishing bonus + Water IQ (facts + speed) + water-wise habits.
+export const FACT_PTS = 125, SPEED_PTS = 25, HABIT_PTS = 300, FINISH_PTS = 100;
+export function scoreOf(answers, times = {}) {
+  const facts = QUESTIONS.filter(q => q.type === 'fact');
+  let correct = 0, speed = 0;
+  facts.forEach(q => {
+    if (answers[q.id] === q.answer) {
+      correct++;
+      const t = times[q.id] ?? 15000;
+      speed += Math.round(SPEED_PTS * Math.max(0, Math.min(1, (15000 - t) / 12000)));
+    }
+  });
+  const habits = buildProfile(answers).habits;
+  const habit = Math.round(HABIT_PTS * Math.max(0, Math.min(1, (150 - habits) / 105)));
+  const iq = correct * FACT_PTS + speed;
+  return { correct, facts: facts.length, speed, iq, habit, finish: FINISH_PTS, total: FINISH_PTS + iq + habit, habits };
+}
 
 // A fun "water personality" from your answers. No judging, just vibes.
 export function personality(profile) {

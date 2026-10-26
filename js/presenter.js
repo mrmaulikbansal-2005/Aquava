@@ -2,7 +2,7 @@ import { initStore, root, SESSION } from './store.js';
 import * as D from './data.js';
 
 const $ = document.getElementById('screen');
-const S = { store: null, players: {}, groups: {}, qi: 0, armed: false };
+const S = { store: null, players: {}, groups: {}, scans: {}, qi: 0, armed: false };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = n => Math.round(n).toLocaleString('en-US');
 const fmt1 = n => (Math.round(n * 10) / 10).toLocaleString('en-US');
@@ -50,10 +50,10 @@ function quizPanel() {
 }
 
 function people() {
-  const r = done().sort((a, b) => (b.progress || 0) - (a.progress || 0) || (a.joinedAt || 0) - (b.joinedAt || 0)).slice(0, 7);
+  const r = done().filter(p => typeof p.score === 'number').sort((a, b) => (b.score - a.score) || (a.finishedAt || 0) - (b.finishedAt || 0)).slice(0, 8);
   if (!r.length) return '<div class="empty">The first person to finish the quiz shows up here.</div>';
   return r.map((p, i) => `<div class="row"><span class="rk">${['🥇', '🥈', '🥉'][i] || i + 1}</span><span class="av">${esc(p.emoji || '💧')}</span>
-    <span class="nm">${esc(p.name)}</span><span class="pc">${fmt1(p.progress || 0)}%</span></div>`).join('');
+    <span class="nm">${esc(p.name)}<div class="sub">${p.correct ?? 0}/4 Water IQ · +${p.habitPts ?? 0} habits</div></span><span class="pc">${p.score}</span></div>`).join('');
 }
 
 function groupsRace() {
@@ -72,18 +72,18 @@ function render() {
   const perYear = perDay * 365;
   const live = S.store?.mode === 'live';
   $.innerHTML = `
-  <header><div class="logo">${LOGO}Aquava</div><span class="tag">Every drop · Every neighbor · One goal</span>
+  <header><div class="logo">${LOGO}Aquava</div><span class="tag">${SESSION === 'partnerday' ? 'W. P. Carey Partner Day · ' : ''}Every drop · Every neighbor · One goal</span>
     <span class="live ${live ? '' : 'local'}"><i></i>${live ? 'LIVE' : 'DEMO MODE'}</span></header>
   <section class="panel">
-    <div class="h">Join the class challenge</div>
+    <div class="h">Join the live challenge</div>
     <div class="qr">${qr()}</div>
     <div class="scan">Scan with your phone camera</div>
     <div class="url">${esc(joinUrl().replace(/^https?:\/\//, ''))}</div>
-    <div class="count"><b>${ps.length}</b><span>joined · ${d.length} finished the quiz</span></div>
+    <div class="count"><b>${Object.keys(S.scans).length}</b><span>scanned · ${d.length} finished the quiz</span></div>
   </section>
   <section class="panel">${quizPanel()}</section>
   <section class="right">
-    <div class="panel" style="flex:1.35"><div class="h">Leaderboard · progress, not gallons</div><div class="rows">${people()}</div></div>
+    <div class="panel" style="flex:1.35"><div class="h">Live ranking · Aquava Score out of 1,000</div><div class="rows">${people()}</div></div>
     <div class="panel" style="flex:1"><div class="h">Group race · public groups</div><div class="rows">${groupsRace()}</div></div>
   </section>
   <footer>
@@ -105,6 +105,7 @@ async function boot() {
   render();
   S.store.on(root('players'), v => { S.players = v || {}; render(); });
   S.store.on(root('groups'), v => { S.groups = v || {}; render(); });
+  S.store.on(root('scans'), v => { S.scans = v || {}; render(); });
   setInterval(() => { S.qi++; render(); }, 8000);
   window.addEventListener('load', render);
 }

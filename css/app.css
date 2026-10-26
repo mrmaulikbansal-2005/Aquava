@@ -1,6 +1,6 @@
 :root{
   --sand:#F6FBFD; --card:#FFFFFF; --line:#E1EDF2; --ink:#0B2530; --txt:#4B6270; --mute:#8197A3;
-  --blue:#0896B8; --aqua:#0BA5C7; --blue-l:#FFFFFF; --tint-b:#DFF5FA; --terra:#F2552F; --terra-l:#FF6B4A; --tint-t:#FFE9E3;
+  --blue:#0896B8; --aqua:#0BA5C7; --blue-l:#FFFFFF; --tint-b:#DFF5FA; --terra:#B97300; --terra-l:#E39B21; --tint-t:#FFF1D6;
   --dark:#0BA5C7; --dark2:#E6F7FB; --dark3:#2E5563; --soft:rgba(255,255,255,.82); --green:#0E9F6E; --tint-g:#DDF7EE;
   --hero:linear-gradient(135deg,#0BB4D6 0%,#0890B4 100%);
   --r:20px; --head:'Outfit',system-ui,-apple-system,'Segoe UI',Arial,sans-serif; --body:'DM Sans',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
@@ -153,3 +153,13 @@ h1,h2,h3{font-family:var(--head);font-weight:700;letter-spacing:-.02em}
 .chip{display:inline-block;background:rgba(255,255,255,.22);color:#fff;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:700;margin-top:6px}
 .codebig{font-weight:800}
 .brow .pc,.weather .num,.codebig{font-family:var(--head)}
+
+.scorecard{text-align:center;padding:26px 22px}
+.sc-n{font-family:var(--head);font-weight:800;font-size:84px;line-height:1;color:#fff}
+.sc-n span{font-size:26px;opacity:.8;margin-left:4px}
+.sc-bar{height:12px;border-radius:99px;background:rgba(255,255,255,.25);margin:16px 6px 14px;overflow:hidden}
+.sc-bar i{display:block;height:100%;background:#fff;border-radius:99px}
+.sc-rank{font-family:var(--head);font-weight:800;font-size:28px;color:#fff}
+.sc-rank span{display:block;font-family:var(--body);font-weight:500;font-size:14px;opacity:.9;margin-top:2px}
+.sc-row{display:flex;justify-content:space-between;gap:12px;font-size:16px}
+.sc-row b{font-weight:700;color:var(--blue)}

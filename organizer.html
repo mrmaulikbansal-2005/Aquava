@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Aquava Organizer</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F6FBFD;--card:#fff;--line:#E1EDF2;--ink:#0B2530;--txt:#4B6270;--aqua:#0BA5C7;--blue:#0896B8;--tint:#DFF5FA;--amber:#B97300}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;padding:28px}
+.wrap{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+h1{font-family:Outfit,sans-serif;font-weight:800;font-size:30px}
+.tag{background:var(--tint);color:var(--blue);font-weight:700;font-size:13px;border-radius:99px;padding:5px 12px}
+.live{margin-left:auto;font-weight:700;font-size:13px;color:#0E9F6E}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.k b{display:block;font-family:Outfit,sans-serif;font-size:40px;line-height:1.05}
+.k span{font-size:13px;color:var(--txt);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}
+.funnel{display:flex;flex-direction:column;gap:10px}
+.fb{display:grid;grid-template-columns:150px 1fr 60px;align-items:center;gap:12px;font-size:14px;font-weight:700}
+.fb .t{height:16px;border-radius:99px;background:var(--line);overflow:hidden}.fb .t i{display:block;height:100%;background:var(--aqua);border-radius:99px}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:inherit;font-weight:700;border:0;border-radius:99px;padding:11px 20px;cursor:pointer;background:var(--blue);color:#fff}
+button.ghost{background:transparent;color:var(--blue);border:2px solid var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--txt);padding:10px 8px;border-bottom:2px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line)}
+td.n{font-variant-numeric:tabular-nums}
+.muted{color:var(--txt);font-size:13px}
+.scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap" id="root"><p class="muted">Loading…</p></div>
+<script type="module" src="js/organizer.js"></script>
+</body>
+</html>

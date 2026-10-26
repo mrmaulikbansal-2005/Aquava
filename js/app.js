@@ -1,4 +1,7 @@
-import { initStore, root } from './store.js';
+import { initStore, root, SESSION } from './store.js';
+const EVENTS = { partnerday: 'W. P. Carey Partner Day' };
+const EVENT_SHORT = { partnerday: 'Partner Day' }[SESSION] || '';
+const EVENT = EVENTS[SESSION] || '';
 import * as D from './data.js';
 
 const $app = document.getElementById('app');
@@ -9,9 +12,9 @@ const params = new URLSearchParams(location.search);
 const S = {
   store: null, uid: null, me: null, players: {}, groups: {},
   screen: 'loading', qi: 0, answers: {}, revealed: false,
-  tab: 'home', seg: 'class', draftName: D.randomName(), draftEmoji: D.randomEmoji(),
+  tab: 'home', seg: 'score', draftName: D.randomName(), draftEmoji: D.randomEmoji(),
   inviteCode: (params.get('g') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4),
-  showQR: false, groupName: '', joinCode: '', err: '', loaded: false,
+  showQR: false, qStart: 0, times: {}, groupName: '', joinCode: '', err: '', loaded: false,
   prevCaptain: undefined, prevRank: undefined, pendingRender: false,
 };
 
@@ -30,8 +33,8 @@ const RIPPLE = `<svg class="ripple" viewBox="0 0 200 200" aria-hidden="true">
   <circle cx="100" cy="100" r="78" fill="none" stroke="#0BA5C7" stroke-width="2" opacity=".35"/>
   <circle cx="100" cy="100" r="98" fill="none" stroke="#0BA5C7" stroke-width="1.5" opacity=".18"/>
   <path d="M100 74s-17 20-17 31a17 17 0 0 0 34 0c0-11-17-31-17-31z" fill="#0BA5C7"/>
-  <circle cx="100" cy="44" r="6" fill="#FF6B4A"/><circle cx="51" cy="128" r="6" fill="#FF6B4A"/><circle cx="149" cy="128" r="6" fill="#FF6B4A"/>
-  <circle cx="22" cy="100" r="4.5" fill="#FF6B4A" opacity=".7"/><circle cx="178" cy="100" r="4.5" fill="#FF6B4A" opacity=".7"/></svg>`;
+  <circle cx="100" cy="44" r="6" fill="#E39B21"/><circle cx="51" cy="128" r="6" fill="#E39B21"/><circle cx="149" cy="128" r="6" fill="#E39B21"/>
+  <circle cx="22" cy="100" r="4.5" fill="#E39B21" opacity=".7"/><circle cx="178" cy="100" r="4.5" fill="#E39B21" opacity=".7"/></svg>`;
 const ICON = {
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/></svg>',
   board: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3"/></svg>',
@@ -40,7 +43,7 @@ const ICON = {
 
 function topbar() {
   const live = S.store.mode === 'live';
-  return `<div class="topbar"><div class="logo">${LOGO}Aquava</div><div class="spacer"></div>
+  return `<div class="topbar"><div class="logo">${LOGO}Aquava</div><div class="spacer"></div>${EVENT_SHORT ? `<span class="pill blue" style="margin-right:8px">${esc(EVENT_SHORT)}</span>` : ''}
     <span class="live ${live ? '' : 'local'}"><i></i>${live ? 'LIVE' : 'DEMO MODE'}</span></div>`;
 }
 
@@ -69,7 +72,7 @@ function vWelcome() {
   <section class="hero fade">
     <span class="eyebrow">Strava for water</span>
     <h1>Saving water, but make it a game.</h1>
-    <p>Take a 60-second quiz to find your water personality, then race your class. Fair for everyone: we score progress, not gallons. 💧</p>
+    <p>Take the 60-second water quiz, get your Aquava Score, and see where you land on the live board. 💧</p>
   </section>
   ${RIPPLE}
   <div class="stack" style="margin-top:8px">
@@ -83,7 +86,7 @@ function vWelcome() {
     <button class="btn" data-act="start">Let's go 💧</button>
     ${S.inviteCode ? `<div class="pill blue" style="align-self:center">You'll join group ${esc(S.inviteCode)} after the quiz</div>` : ''}
   </div>
-  <p class="foot">CIS 415 prototype by Devansh Purohit &amp; Maulik Bansal, Arizona State University</p>`;
+  <p class="foot">Aquava · Every drop. Every neighbor. One goal.<br>Built in Tempe, Arizona</p>`;
 }
 
 function roomPct(qid) {
@@ -94,6 +97,7 @@ function roomPct(qid) {
 
 function vQuiz() {
   const Q = D.QUESTIONS[S.qi]; const total = D.QUESTIONS.length;
+  if (Q.type === 'fact' && S.answers[Q.id] === undefined && S.qStartFor !== Q.id) { S.qStart = Date.now(); S.qStartFor = Q.id; }
   const sel = S.answers[Q.id];
   const isFact = Q.type === 'fact'; const rev = isFact && S.revealed;
   const room = rev ? roomPct(Q.id) : null;
@@ -101,7 +105,7 @@ function vQuiz() {
     let cls = '';
     if (rev) cls = i === Q.answer ? 'right' : (i === sel ? 'wrong' : '');
     else if (sel === i) cls = 'sel';
-    const pct = room && room.n ? `<span class="pct">${Math.round(((room.counts[i] || 0) / room.n) * 100)}% of class</span>` : '';
+    const pct = room && room.n ? `<span class="pct">${Math.round(((room.counts[i] || 0) / room.n) * 100)}% of players</span>` : '';
     return `<button class="opt ${cls}" data-act="answer" data-i="${i}" ${rev ? 'disabled' : ''}><span class="k">${'ABCD'[i]}</span>${esc(o)}${pct}</button>`;
   }).join('');
   return `<div class="qtop">
@@ -116,8 +120,34 @@ function vQuiz() {
       ${rev ? `<div class="card ${sel === Q.answer ? 'blue' : 'terra'} reveal">
           <b>${sel === Q.answer ? 'Nailed it! 🎉' : 'Ooh, close! Here\'s the real answer 👇'}</b>
           <p class="small" style="margin-top:6px;line-height:1.45">${esc(Q.reveal)}</p></div>
-        <button class="btn" data-act="next" style="margin-top:14px">${S.qi === total - 1 ? 'Reveal my water personality ✨' : 'Next'}</button>` : ''}
+        <button class="btn" data-act="next" style="margin-top:14px">${S.qi === total - 1 ? 'See my Aquava Score ✨' : 'Next'}</button>` : ''}
     </div>`;
+}
+
+const scored = () => finished().filter(p => typeof p.score === 'number').sort((a, b) => (b.score - a.score) || ((a.finishedAt || 0) - (b.finishedAt || 0)));
+function scoreRank() { const r = scored(); const i = r.findIndex(p => p.id === S.uid); return { rank: i < 0 ? null : i + 1, n: r.length }; }
+function vResult() {
+  const sc = S.lastScore || D.scoreOf(S.me.answers || {}, S.me.times || {});
+  const { rank, n } = scoreRank();
+  const pct = Math.round(sc.total / 10);
+  return `${topbar()}
+  <div class="stack fade">
+    <span class="eyebrow">Your Aquava Score</span>
+    <div class="card dark scorecard pop">
+      <div class="sc-n">${sc.total}<span>/1000</span></div>
+      <div class="sc-bar"><i style="width:${pct}%"></i></div>
+      <div class="sc-rank">${rank ? `#${rank} of ${n}` : ''} <span>${EVENT ? 'at ' + esc(EVENT) : 'on the live board'}</span></div>
+    </div>
+    <div class="card stack" style="gap:16px">
+      <div class="sc-row"><span>✅ Finished the quiz</span><b>+${sc.finish} pts</b></div>
+      <div class="sc-row"><span>🧠 Water IQ</span><b>${sc.correct}/${sc.facts} right · ${sc.correct * D.FACT_PTS} pts</b></div>
+      <div class="sc-row"><span>⚡ Speed bonus</span><b>+${sc.speed} pts</b></div>
+      <div class="sc-row"><span>💧 Water-wise habits</span><b>+${sc.habit} pts</b></div>
+    </div>
+    <div class="card blue alert"><div class="ic">📺</div><div><h3>You're on the live board!</h3><p class="small" style="line-height:1.45">Look up at the screen to find <b>${esc(S.me.emoji)} ${esc(S.me.name)}</b>. Want a higher score? Fix your leak and pick easy wins in the app.</p></div></div>
+    <button class="btn" data-act="toprofile">See my water personality ✨</button>
+    <button class="btn ghost" data-act="tab" data-tab="board" style="margin-top:-4px">See the full ranking 🏆</button>
+  </div>`;
 }
 
 function vProfile() {
@@ -169,7 +199,7 @@ function vHome() {
       ${ring(me.progress || 0)}
       <div class="stack" style="gap:10px">
         <div class="stat"><b>${fmt(me.saved || 0)} gal</b><span>saved a day, out of ${prof.baseline}</span></div>
-        <div class="stat"><b>${rank ? '#' + rank : '–'}<span style="font-size:15px;color:var(--soft)"> of ${n}</span></b><span>in your class</span></div>
+        <div class="stat"><b>${rank ? '#' + rank : '–'}<span style="font-size:15px;color:var(--soft)"> of ${n}</span></b><span>${EVENT ? 'today' : 'on the board'}</span></div>
       </div>
     </div>
     ${!on.leak ? `<div class="card terra alert">
@@ -204,7 +234,11 @@ function personRow(p, i, opts = {}) {
 
 function vBoard() {
   let body;
-  if (S.seg === 'class') {
+  if (S.seg === 'score') {
+    const r = scored();
+    body = r.length ? `<div class="board">${r.map((p, i) => { const row = personRow(p, i, { sub: p => `${p.correct ?? 0}/4 Water IQ · +${p.habitPts ?? 0} habits` }); return row.replace(/<span class="pc">[^<]*<\/span>/, `<span class="pc">${p.score}</span>`); }).join('')}</div>`
+      : `<div class="empty">Nobody has finished the quiz yet. Be the first!</div>`;
+  } else if (S.seg === 'class') {
     const r = ranked();
     body = r.length ? `<div class="board">${r.map((p, i) => personRow(p, i, { sub: p => `${fmt(p.saved || 0)} gal a day saved` })).join('')}</div>`
       : `<div class="empty">Nobody has finished the quiz yet. Be the first!</div>`;
@@ -223,10 +257,10 @@ function vBoard() {
   return `${topbar()}
   <div class="stack fade">
     <span class="eyebrow">Leaderboard</span>
-    <h2 style="font-size:30px;line-height:1.1">Ranked on progress, not gallons</h2>
-    <div class="seg"><button class="${S.seg === 'class' ? 'on' : ''}" data-act="seg" data-seg="class">Everyone</button><button class="${S.seg === 'groups' ? 'on' : ''}" data-act="seg" data-seg="groups">Group race</button></div>
+    <h2 style="font-size:30px;line-height:1.1">${S.seg === 'score' ? 'Live Aquava Score ranking' : 'Ranked on progress, not gallons'}</h2>
+    <div class="seg"><button class="${S.seg === 'score' ? 'on' : ''}" data-act="seg" data-seg="score">Score</button><button class="${S.seg === 'class' ? 'on' : ''}" data-act="seg" data-seg="class">Savings</button><button class="${S.seg === 'groups' ? 'on' : ''}" data-act="seg" data-seg="groups">Groups</button></div>
     <div class="card" style="padding:8px 12px">${body}</div>
-    <p class="small muted" style="line-height:1.45">${S.seg === 'class' ? 'A tiny apartment and a big house with a yard can both win. Your score is how much you improved on your own normal.' : 'A group\'s score is the average progress of its members, so small groups can beat big ones.'}</p>
+    <p class="small muted" style="line-height:1.45">${S.seg === 'score' ? 'Score out of 1,000: finishing, Water IQ answers, a speed bonus, and water-wise habits.' : S.seg === 'class' ? 'A tiny apartment and a big house with a yard can both win. Your score is how much you improved on your own normal.' : 'A group\'s score is the average progress of its members, so small groups can beat big ones.'}</p>
   </div>`;
 }
 
@@ -301,6 +335,7 @@ function render(force) {
   const inApp = S.screen === 'app';
   if (S.screen === 'welcome') html = vWelcome();
   else if (S.screen === 'quiz') html = vQuiz();
+  else if (S.screen === 'result') html = vResult();
   else if (S.screen === 'profile') html = vProfile();
   else if (inApp) html = S.tab === 'home' ? vHome() : S.tab === 'board' ? vBoard() : vGroup();
   $app.className = 'app' + (inApp ? '' : ' no-tabs');
@@ -329,7 +364,7 @@ async function onAction(el) {
   else if (act === 'answer') {
     const Q = D.QUESTIONS[S.qi]; const i = +el.dataset.i;
     S.answers[Q.id] = i;
-    if (Q.type === 'fact') { S.revealed = true; render(true); }
+    if (Q.type === 'fact') { S.times[Q.id] = Date.now() - (S.qStart || Date.now()); S.revealed = true; render(true); }
     else { render(true); setTimeout(() => nextQ(), 260); }
   }
   else if (act === 'next') nextQ();
@@ -337,8 +372,9 @@ async function onAction(el) {
     if (S.qi === 0) return go('welcome');
     S.qi--; S.revealed = D.QUESTIONS[S.qi].type === 'fact' && S.answers[D.QUESTIONS[S.qi].id] !== undefined; render(true);
   }
+  else if (act === 'toprofile') { go('profile'); }
   else if (act === 'toapp') { go('app', 'home'); maybeAutoJoin(); }
-  else if (act === 'tab') { S.tab = el.dataset.tab; S.err = ''; render(true); window.scrollTo(0, 0); }
+  else if (act === 'tab') { if (S.screen !== 'app') S.screen = 'app'; S.tab = el.dataset.tab; S.err = ''; render(true); window.scrollTo(0, 0); }
   else if (act === 'seg') { S.seg = el.dataset.seg; render(true); }
   else if (act === 'swap') {
     const id = el.dataset.id; const swaps = { ...(S.me.swaps || {}) };
@@ -350,7 +386,7 @@ async function onAction(el) {
     if (id === 'leak' && swaps.leak) toast('🔧 Leak fixed! +' + D.LEAK_GAL + ' gallons a day');
     render(true);
   }
-  else if (act === 'retake') { S.qi = 0; S.answers = { ...(S.me.answers || {}) }; S.revealed = false; go('quiz'); }
+  else if (act === 'retake') { S.qi = 0; S.times = {}; S.qStartFor = null; S.answers = {}; S.revealed = false; go('quiz'); }
   else if (act === 'create') {
     const name = (document.getElementById('gn')?.value || '').trim().replace(/\s+/g, ' ');
     S.groupName = name;
@@ -400,8 +436,11 @@ async function nextQ() {
   const prof = D.buildProfile(S.answers);
   const keep = S.me?.swaps?.leak ? { leak: true } : {};
   const saved = D.buildSwaps(S.answers, prof).filter(s => keep[s.id]).reduce((t, s) => t + s.gal, 0);
-  await saveMe({ answers: { ...S.answers }, baseline: prof.baseline, swaps: keep, saved, progress: D.progressOf(prof.baseline, saved), quizDone: true });
-  go(keep.leak ? 'app' : 'profile', 'home');
+  const sc = D.scoreOf(S.answers, S.times);
+  const best = Math.max(sc.total, S.me?.score || 0);
+  await saveMe({ answers: { ...S.answers }, times: { ...S.times }, baseline: prof.baseline, swaps: keep, saved, progress: D.progressOf(prof.baseline, saved), quizDone: true,
+    score: best, iq: sc.iq, correct: sc.correct, speed: sc.speed, habitPts: sc.habit, habitsGal: sc.habits, finishedAt: S.me?.finishedAt || Date.now() });
+  S.lastScore = sc; go('result');
 }
 
 function syncName() { const i = document.getElementById('nm'); if (i) S.draftName = i.value; }
@@ -440,6 +479,7 @@ function checkBanter() {
 
 async function boot() {
   S.store = await initStore(); S.uid = S.store.uid;
+  try { const seen = await S.store.get(root('scans/' + S.uid)); if (!seen) await S.store.set(root('scans/' + S.uid), Date.now()); } catch (e) {}
   S.store.on(root('players'), v => {
     S.players = v || {}; S.me = S.players[S.uid] || null;
     if (!S.loaded) {
