@@ -41,11 +41,21 @@ async function firebaseStore() {
   const db_ = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const uid = await new Promise((res, rej) => {
-    onAuthStateChanged(auth, u => { if (u) res(u.uid); });
-    signInAnonymously(auth).catch(rej);
-  });
+  // Prefer anonymous sign-in; if it is not enabled, keep going with a device id
+  let uid;
+  try {
+    uid = await Promise.race([
+      new Promise((res, rej) => { onAuthStateChanged(auth, u => { if (u) res(u.uid); }); signInAnonymously(auth).catch(rej); }),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('auth timeout')), 8000)),
+    ]);
+  } catch (e) {
+    console.warn('Anonymous sign-in unavailable, using a device id', e);
+    try { uid = localStorage.getItem('aq_device_id'); } catch {}
+    if (!uid) { uid = 'd' + Math.random().toString(36).slice(2, 12); try { localStorage.setItem('aq_device_id', uid); } catch {} }
+  }
   const db = db_.getDatabase(app);
+  // Fail fast (and fall back) if the database refuses reads
+  await Promise.race([db_.get(db_.ref(db, 'sessions/_ping')), new Promise((_, rej) => setTimeout(() => rej(new Error('db timeout')), 8000))]);
   return {
     mode: 'live', uid,
     on(path, cb) { return db_.onValue(db_.ref(db, path), s => cb(s.val())); },
