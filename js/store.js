@@ -1,7 +1,7 @@
 // One tiny data layer with two engines:
 //  - Firebase Realtime Database (live, shared by every phone)
 //  - local demo mode (localStorage, shared between tabs) for testing
-import { firebaseConfig } from './config.js';
+import { firebaseConfig } from './config.js?v=6';
 
 export const SESSION = (new URLSearchParams(location.search).get('s') || 'class')
   .replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24) || 'class';

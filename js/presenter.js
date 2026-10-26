@@ -1,5 +1,5 @@
-import { initStore, root, SESSION } from './store.js';
-import * as D from './data.js';
+import { initStore, root, SESSION } from './store.js?v=6';
+import * as D from './data.js?v=6';
 
 const $ = document.getElementById('screen');
 const S = { store: null, players: {}, groups: {}, scans: {}, qi: 0, armed: false };

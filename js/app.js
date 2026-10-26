@@ -1,8 +1,8 @@
-import { initStore, root, SESSION } from './store.js';
+import { initStore, root, SESSION } from './store.js?v=6';
 const EVENTS = { partnerday: 'W. P. Carey Partner Day' };
 const EVENT_SHORT = { partnerday: 'Partner Day' }[SESSION] || '';
 const EVENT = EVENTS[SESSION] || '';
-import * as D from './data.js';
+import * as D from './data.js?v=6';
 
 const $app = document.getElementById('app');
 const $tabs = document.getElementById('tabs');
