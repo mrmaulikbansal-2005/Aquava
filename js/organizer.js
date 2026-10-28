@@ -1,5 +1,5 @@
-import { initStore, root, SESSION, adminSignIn, adminEmail } from './store.js?v=7';
-import * as D from './data.js?v=7';
+import { initStore, root, SESSION, adminSignIn, adminEmail } from './store.js?v=8';
+import * as D from './data.js?v=8';
 
 const $ = document.getElementById('root');
 const S = { players: {}, scans: {}, groups: {}, posts: {}, contacts: null, contactErr: '', mode: '', st: null };

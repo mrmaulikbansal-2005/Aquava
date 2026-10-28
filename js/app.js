@@ -1,10 +1,10 @@
-import { initStore, root, SESSION } from './store.js?v=7';
+import { initStore, root, SESSION } from './store.js?v=8';
 const EVENTS = { partnerday: 'W. P. Carey Partner Day' };
 const EVENT_SHORT = { partnerday: 'Partner Day' }[SESSION] || '';
 const EVENT = EVENTS[SESSION] || '';
-import * as D from './data.js?v=7';
-import * as R from './reco.js?v=7';
-import * as W from './rewards.js?v=7';
+import * as D from './data.js?v=8';
+import * as R from './reco.js?v=8';
+import * as W from './rewards.js?v=8';
 
 const $app = document.getElementById('app');
 const $tabs = document.getElementById('tabs');
@@ -294,7 +294,7 @@ function vFeed() {
         <div class="sub">${W.TIER_LABEL[p.tier] || ''} · ${ago(p.ts)}</div></div></div>
       <p class="ptext">${esc(p.text)}</p>
       ${act && !mine ? `<div class="pact">${act.icon} <b>${esc(act.title)}</b>${done.has(act.id) ? '<span class="pill green" style="margin-left:auto">You do this</span>' : `<button class="btn sm green" data-act="try" data-id="${act.id}" style="margin-left:auto">Try it too +${W.PTS.perTried}</button>`}</div>` : ''}
-      <div class="row" style="margin-top:8px"><button class="cheer ${cheered ? 'on' : ''}" data-act="cheer" data-id="${p.id}" ${mine ? 'disabled' : ''}>👏 ${cheers || ''} ${cheered ? 'Cheered' : 'Cheer'}</button></div>
+      <div class="row" style="margin-top:8px"><button class="cheer ${cheered ? 'on' : ''}" data-act="cheer" data-id="${p.id}" ${mine ? 'disabled' : ''}>👏 ${mine ? (cheers ? cheers + (cheers > 1 ? ' cheers' : ' cheer') : 'No cheers yet') : (cheers || '') + ' ' + (cheered ? 'Cheered' : 'Cheer')}</button></div>
     </div>`;
   };
   return `${topbar()}

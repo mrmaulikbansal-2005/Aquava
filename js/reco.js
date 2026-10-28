@@ -4,7 +4,7 @@
 //  2. Collaborative: boost actions that similar homes ("homes like yours")
 //     actually tried, using quiz answers as the similarity signal.
 //  3. Exclude anything the person already does or already tried.
-import { buildProfile, WEATHER } from './data.js?v=7';
+import { buildProfile, WEATHER } from './data.js?v=8';
 
 // The "items" the system can recommend. Gallons are rough per-day estimates
 // built from EPA WaterSense figures; `fits` says when an action applies.
