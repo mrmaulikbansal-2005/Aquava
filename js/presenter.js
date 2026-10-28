@@ -1,5 +1,5 @@
-import { initStore, root, SESSION } from './store.js?v=6';
-import * as D from './data.js?v=6';
+import { initStore, root, SESSION } from './store.js?v=7';
+import * as D from './data.js?v=7';
 
 const $ = document.getElementById('screen');
 const S = { store: null, players: {}, groups: {}, scans: {}, qi: 0, armed: false };
@@ -97,7 +97,8 @@ function render() {
 document.addEventListener('click', async e => {
   if (e.target.id !== 'reset') return;
   if (!S.armed) { S.armed = true; render(); setTimeout(() => { S.armed = false; render(); }, 4000); return; }
-  S.armed = false; await S.store.remove(root());
+  S.armed = false;
+  try { await S.store.remove(root()); } catch (e) { alert('Only the organizer can reset. Open organizer.html, sign in with Google, then use Reset session.'); }
 });
 
 async function boot() {

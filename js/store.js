@@ -1,7 +1,7 @@
 // One tiny data layer with two engines:
 //  - Firebase Realtime Database (live, shared by every phone)
 //  - local demo mode (localStorage, shared between tabs) for testing
-import { firebaseConfig } from './config.js?v=6';
+import { firebaseConfig } from './config.js?v=7';
 
 export const SESSION = (new URLSearchParams(location.search).get('s') || 'class')
   .replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24) || 'class';
@@ -34,6 +34,8 @@ function mockStore() {
   };
 }
 
+let FB = null; // kept so the organizer page can sign in with Google
+
 async function firebaseStore() {
   const V = '10.12.2';
   const { initializeApp } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
@@ -41,6 +43,7 @@ async function firebaseStore() {
   const db_ = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  FB = { V, auth };
   // Prefer anonymous sign-in; if it is not enabled, keep going with a device id
   let uid;
   try {
@@ -55,10 +58,10 @@ async function firebaseStore() {
   }
   const db = db_.getDatabase(app);
   // Fail fast (and fall back) if the database refuses reads
-  await Promise.race([db_.get(db_.ref(db, 'sessions/_ping')), new Promise((_, rej) => setTimeout(() => rej(new Error('db timeout')), 8000))]);
+  await Promise.race([db_.get(db_.ref(db, 'sessions/_ping/players')), new Promise((_, rej) => setTimeout(() => rej(new Error('db timeout')), 8000))]);
   return {
     mode: 'live', uid,
-    on(path, cb) { return db_.onValue(db_.ref(db, path), s => cb(s.val())); },
+    on(path, cb, onErr) { return db_.onValue(db_.ref(db, path), s => cb(s.val()), e => { console.warn("read denied", path, e?.code); onErr && onErr(e); }); },
     async get(path) { return (await db_.get(db_.ref(db, path))).val(); },
     set(path, v) { return db_.set(db_.ref(db, path), v); },
     update(path, obj) { return db_.update(db_.ref(db, path), obj); },
@@ -73,3 +76,12 @@ export async function initStore() {
   }
   return mockStore();
 }
+
+// Organizer only: sign in with Google so security rules can unlock contacts
+export async function adminSignIn() {
+  if (!FB) throw new Error('Live mode is off');
+  const { GoogleAuthProvider, signInWithPopup } = await import(`https://www.gstatic.com/firebasejs/${FB.V}/firebase-auth.js`);
+  const res = await signInWithPopup(FB.auth, new GoogleAuthProvider());
+  return res.user.email;
+}
+export function adminEmail() { return FB?.auth?.currentUser?.email || null; }

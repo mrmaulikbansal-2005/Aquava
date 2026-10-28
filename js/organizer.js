@@ -1,8 +1,8 @@
-import { initStore, root, SESSION } from './store.js?v=6';
-import * as D from './data.js?v=6';
+import { initStore, root, SESSION, adminSignIn, adminEmail } from './store.js?v=7';
+import * as D from './data.js?v=7';
 
 const $ = document.getElementById('root');
-const S = { players: {}, scans: {}, groups: {}, mode: '' };
+const S = { players: {}, scans: {}, groups: {}, posts: {}, contacts: null, contactErr: '', mode: '', st: null };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const t = ms => ms ? new Date(ms).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
 
@@ -31,16 +31,30 @@ function render() {
     <div class="k"><b>${top}</b><span>Top score</span></div>
     <div class="k"><b>${iqAvg}/4</b><span>Avg Water IQ</span></div>
     <div class="k"><b>${Math.round(pledged)}</b><span>Gal/day pledged</span></div>
+    <div class="k"><b>${all.filter(p => p.hasContact).length}</b><span>Left contact</span></div>
+    <div class="k"><b>${Object.keys(S.posts).length}</b><span>Feed posts</span></div>
+  </div>
+  <div class="card">
+    <div class="row"><b style="font-family:Outfit,sans-serif;font-size:20px">Contacts (private)</b><span style="flex:1"></span>
+    ${S.contacts ? `<span class="muted">Signed in as ${esc(adminEmail() || '')}</span><button id="ccsv">Download contacts (CSV)</button><button id="reset" class="ghost">${S.armReset ? 'Tap again to wipe this session' : 'Reset session'}</button>` : `<button id="signin">Sign in with Google to view</button>`}</div>
+    ${S.contactErr ? `<p class="muted" style="color:#B97300;margin-top:8px">${esc(S.contactErr)}</p>` : ''}
+    ${S.contacts ? `<div class="scroll" style="margin-top:10px"><table><tr><th>Username</th><th>Type</th><th>Contact</th><th>ZIP</th><th>When</th></tr>${Object.values(S.contacts).sort((a, b) => b.ts - a.ts).map(c => `<tr><td>${esc(c.name)}</td><td>${esc(c.type)}</td><td>${esc(c.value)}</td><td>${esc(c.zip || '')}</td><td>${t(c.ts)}</td></tr>`).join('')}</table></div>` : '<p class="muted" style="margin-top:8px">Only the organizer account can read emails and phone numbers.</p>'}
   </div>
   <div class="card"><div class="funnel">${fb('Scanned', scans)}${fb('Started quiz', all.length)}${fb('Finished quiz', fin.length)}</div></div>
   <div class="card">
-    <div class="row" style="margin-bottom:12px"><b style="font-family:Outfit,sans-serif;font-size:20px">All participants</b><span class="muted">Usernames only. No contact details are collected.</span><span style="flex:1"></span><button id="csv">Download results (CSV)</button></div>
+    <div class="row" style="margin-bottom:12px"><b style="font-family:Outfit,sans-serif;font-size:20px">All participants</b><span class="muted">Usernames and scores. Contacts are in the private section above.</span><span style="flex:1"></span><button id="csv">Download results (CSV)</button></div>
     <div class="scroll"><table><tr><th>#</th><th>Username</th><th>Score</th><th>Water IQ</th><th>Speed</th><th>Habits</th><th>Gal/day</th><th>Personality</th><th>Group</th><th>Finished</th></tr>
     ${all.map((p, i) => { const pers = p.answers ? D.personality(D.buildProfile(p.answers)).name : ''; return `<tr><td class="n">${p.quizDone ? i + 1 : ''}</td><td>${esc(p.emoji || '')} ${esc(p.name)}</td><td class="n"><b>${p.score ?? '·'}</b></td><td class="n">${p.correct ?? ''}${p.correct != null ? '/4' : ''}</td><td class="n">${p.speed ?? ''}</td><td class="n">${p.habitPts ?? ''}</td><td class="n">${p.habitsGal ?? ''}</td><td>${esc(pers)}</td><td>${esc(S.groups[p.groupId]?.name || '')}</td><td>${p.quizDone ? t(p.finishedAt) : 'in progress'}</td></tr>`; }).join('')}
     </table></div>
   </div>
   <p class="muted">Projector screen: <a href="presenter.html?s=${encodeURIComponent(SESSION)}">presenter.html?s=${esc(SESSION)}</a> · Player link: <a href="./?s=${encodeURIComponent(SESSION)}">./?s=${esc(SESSION)}</a></p>`;
   document.getElementById('csv').onclick = download;
+  const si = document.getElementById('signin'); if (si) si.onclick = signIn;
+  const cc = document.getElementById('ccsv'); if (cc) cc.onclick = downloadContacts;
+  const rs = document.getElementById('reset'); if (rs) rs.onclick = async () => {
+    if (!S.armReset) { S.armReset = true; render(); setTimeout(() => { S.armReset = false; render(); }, 4000); return; }
+    S.armReset = false; try { await S.st.remove(root()); } catch (e) { S.contactErr = 'Reset failed: ' + (e.code || e.message); } render();
+  };
 }
 
 function download() {
@@ -52,8 +66,20 @@ function download() {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `aquava-${SESSION}-results.csv`; a.click();
 }
 
+async function signIn() {
+  S.contactErr = '';
+  try { await adminSignIn(); S.st.on(root('contacts'), v => { S.contacts = v || {}; render(); }, e => { S.contactErr = 'This account is not allowed to view contacts.'; S.contacts = null; render(); }); }
+  catch (e) { S.contactErr = 'Sign-in failed: ' + (e.code || e.message); render(); }
+}
+function downloadContacts() {
+  const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const lines = [['username', 'type', 'contact', 'zip', 'consent', 'signed_up'].join(',')].concat(Object.values(S.contacts || {}).map(c => [c.name, c.type, c.value, c.zip, c.consent ? 'yes' : 'no', new Date(c.ts).toISOString()].map(q).join(',')));
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' })); a.download = `aquava-${SESSION}-contacts.csv`; a.click();
+}
+
 (async () => {
-  const st = await initStore(); S.mode = st.mode;
+  const st = await initStore(); S.mode = st.mode; S.st = st;
+  st.on(root('posts'), v => { S.posts = v || {}; render(); });
   st.on(root('players'), v => { S.players = v || {}; render(); });
   st.on(root('scans'), v => { S.scans = v || {}; render(); });
   st.on(root('groups'), v => { S.groups = v || {}; render(); });

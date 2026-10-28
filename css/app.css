@@ -163,3 +163,59 @@ h1,h2,h3{font-family:var(--head);font-weight:700;letter-spacing:-.02em}
 .sc-rank span{display:block;font-family:var(--body);font-weight:500;font-size:14px;opacity:.9;margin-top:2px}
 .sc-row{display:flex;justify-content:space-between;gap:12px;font-size:16px}
 .sc-row b{font-weight:700;color:var(--blue)}
+
+/* ---- sign-up ---- */
+.lab{font-weight:700;font-size:14px;color:var(--ink)}
+.chips-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chipbtn{background:var(--tint-b);color:var(--blue);font-weight:700;font-size:13px;padding:8px 12px;border-radius:999px;border:1.5px solid transparent;text-align:left}
+.chipbtn.ghost{background:transparent;border-color:var(--line);color:var(--txt)}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.4;color:var(--txt)}
+.consent input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--blue)}
+.tiny{font-size:12px;line-height:1.45}
+/* ---- tip ---- */
+.ptspill{background:var(--tint-t);color:var(--terra);font-weight:800;font-size:14px;padding:8px 12px;border-radius:999px;flex:none}
+.tipcard{border:2px solid var(--green);background:linear-gradient(180deg,#F1FBF6,#fff 60%)}
+.tipic{font-size:34px;width:58px;height:58px;border-radius:16px;background:var(--tint-g);display:grid;place-items:center;flex:none}
+.tiptitle{font-family:var(--head);font-weight:800;font-size:21px;line-height:1.2}
+.tipgal{margin:12px 0 6px;font-size:14px;color:var(--green)}
+.why{list-style:none;display:flex;flex-direction:column;gap:5px;margin:6px 0 12px}
+.why li{font-size:13px;line-height:1.4;color:var(--txt);padding-left:20px;position:relative}
+.why li::before{content:'✓';position:absolute;left:2px;color:var(--green);font-weight:800}
+.btn.green{background:var(--green)}
+.moretips{display:flex;flex-direction:column;gap:6px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.mtip{display:flex;gap:10px;align-items:center;font-size:14px;font-weight:600;padding:8px 10px;border-radius:12px;background:var(--sand)}
+.mtip b{color:var(--green);font-size:13px}
+/* ---- feed ---- */
+.post{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.post .av{width:40px;height:40px;border-radius:12px;background:var(--sand);display:grid;place-items:center;font-size:21px;flex:none}
+.post .nm{font-weight:700;font-size:15px}
+.post .sub{font-size:12px;color:var(--txt)}
+.ptext{font-size:16px;line-height:1.4;margin-top:10px}
+.pact{display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--tint-g);font-size:13px}
+.cheer{font-weight:700;font-size:14px;color:var(--txt);padding:7px 12px;border-radius:999px;border:1.5px solid var(--line)}
+.cheer.on{background:var(--tint-t);border-color:transparent;color:var(--terra)}
+.cheer[disabled]{opacity:.5}
+/* ---- profile ---- */
+.profcard{padding:20px}
+.bigav{font-size:34px;width:62px;height:62px;border-radius:18px;background:rgba(255,255,255,.22);display:grid;place-items:center;flex:none}
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.pgrid div{background:rgba(255,255,255,.16);border-radius:14px;padding:10px 6px;text-align:center}
+.pgrid b{display:block;font-family:var(--head);font-weight:800;font-size:20px;color:#fff}
+.pgrid span{font-size:11px;color:rgba(255,255,255,.9)}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.badge{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 8px;text-align:center;opacity:.55;filter:grayscale(1)}
+.badge.on{opacity:1;filter:none;border-color:var(--green);background:var(--tint-g)}
+.badge .bi{font-size:28px}
+.badge b{display:block;font-size:13px;margin-top:4px;line-height:1.2}
+.badge span{display:block;font-size:11px;color:var(--txt);margin-top:3px;line-height:1.3}
+.perk{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.perk.on{border-color:var(--green)}
+.perk .ic{font-size:24px;width:44px;height:44px;border-radius:12px;background:var(--sand);display:grid;place-items:center;flex:none}
+.perk .t{font-weight:700;font-size:15px;line-height:1.3}
+.perk .d{font-size:12px;color:var(--txt);margin-top:2px}
+.codecard{text-align:center;border:2px solid var(--blue)}
+.bigcode{font-family:var(--head);font-weight:800;font-size:46px;letter-spacing:.14em;color:var(--blue);margin:6px 0}
+.tabs button{font-size:10.5px}
+
+.scrollx{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.scrollx .chipbtn{white-space:nowrap;flex:none}
